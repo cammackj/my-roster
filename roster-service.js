@@ -24,39 +24,25 @@ function RosterService(endpointUri, callback) {
             console.log('Writing Player Data to localStorage')
             localStorage.setItem('playersData', JSON.stringify(playersData))
             console.log('Finished Writing Player Data to localStorage')
-            console.log(playersData)
+            // console.log(playersData)
             callback()
         });
     }
     loadPlayersData(); //call the function above every time we create a new service
 
-   
-   
-//    PUBLIC PARTS
-   
+
+
+    //    PUBLIC PARTS
+
     this.getPlayersByName = function (playerName) {
         //return an array of all players who match the given teamName.        
-         console.log(playersData)
-        playersData.filter(function (player) {
+        //  console.log(playersData)
+        var players = playersData.filter(function (player) {
             if (player.firstname.toLowerCase() == playerName) {
-                console.log(player)
-                return true;
+                // console.log(player)
+                return true
             }
         });
+        return players
     }
-
-    // this.getPlayersByPosition = function (position) {
-    //     //return an array of all players who match the given position.
-    //     playersData.filter(function (player) {
-    //         if (player.position == position) {
-    //             return true;
-    //         }
-    //     });
-    // }
-
-
-
-
-
-
 }

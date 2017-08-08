@@ -13,12 +13,26 @@ function RosterController() {
             var teamSF = rosterService.getPlayersByTeam("SF");
         });
     }
-    
-    this.getPlayersByName = function(e){
+
+    function drawResults(players) {
+        var template = ''
+        var resultElem = document.getElementById('playerResults')
+        console.log(players)
+        for (i = 0; i < players.length; i++) {
+            var player = players[i]
+            template += `
+            <p>Player Name:${player.firstname}</p>
+            <img src="${player.photo}" alt="" class="src">
+            `
+        }
+        resultElem.innerHTML = template
+    }
+
+    this.getPlayersByName = function (e) {
         e.preventDefault()
-        console.log(e)
         var name = e.target.inputName.value.toLowerCase()
-        rosterService.getPlayersByName(name)   
+        var playerData = rosterService.getPlayersByName(name)
+        drawResults(playerData)
     }
 
 
