@@ -1,17 +1,21 @@
 function RosterService(endpointUri, callback) {
 
+    // PRIVATE PARTS
+
     var playersData = [];
+    var myRoster = [];
 
     function loadPlayersData() {
 
-        //Lets check the localstorage for the data before making the call.
-        //Ideally if a user has already used your site 
-        //we can cut down on the load time by saving and pulling from localstorage 
-
         var localData = localStorage.getItem('playersData');
+        var myData = localStorage.getItem('myRoster')
+
         if (localData) {
             playersData = JSON.parse(localData);
-            return callback(playersData);
+            return callback(playersData, myRoster);
+        }
+        if (myData) {
+            myRoster = JSON.parse(myData);
         }
 
         var url = "http://bcw-getter.herokuapp.com/?url=";
@@ -20,29 +24,70 @@ function RosterService(endpointUri, callback) {
 
         return $.getJSON(apiUrl).then(function (data) {
             playersData = data.body.players;
-            console.log('Player Data Ready')
-            console.log('Writing Player Data to localStorage')
-            localStorage.setItem('playersData', JSON.stringify(playersData))
-            console.log('Finished Writing Player Data to localStorage')
-            // console.log(playersData)
+            localStorage.setItem('playersData', JSON.stringify(playersData));
             callback()
         });
     }
-    loadPlayersData(); //call the function above every time we create a new service
+    loadPlayersData();
 
-
+    function savePlayers() {
+        localStorage.setItem('myRoster', JSON.stringify(myRoster))
+    }
 
     //    PUBLIC PARTS
 
     this.getPlayersByName = function (playerName) {
-        //return an array of all players who match the given teamName.        
-        //  console.log(playersData)
         var players = playersData.filter(function (player) {
             if (player.firstname.toLowerCase() == playerName) {
-                // console.log(player)
+                return true
+            }
+            if (player.lastname.toLowerCase() == playerName) {
+                return true
+            }
+            if (player.fullname.toLowerCase() == playerName) {
                 return true
             }
         });
         return players
+    }
+
+    this.getPlayersByTeam = function (playerTeam) {
+        var team = playersData.filter(function (player) {
+            if (player.pro_team.toLowerCase() == playerTeam) {
+                return true;
+            }
+        });
+        return team
+    }
+
+    this.getPlayersByPosition = function (playerPosition) {
+        var position = playersData.filter(function (player) {
+            if (player.position.toLowerCase() == playerPosition) {
+                return true;
+            }
+        });
+        console.log(position)
+        return position
+
+    }
+
+    this.addPlayer = function (id, callback) {
+        var player = playersData.find(char => char.id == id)
+
+        if (myRoster.indexOf(player) == -1) {
+            myRoster.push(player)
+            savePlayers()
+            callback(myRoster)
+        }
+    }
+
+    this.removePlayer = function (id, callback) {
+        var player = myRoster.find(char => char.id == id)
+        var pos = myRoster.indexOf(player)
+        if (pos != -1) {
+            myRoster.splice(pos, 1)
+        }
+        savePlayers()
+        callback(myRoster)
     }
 }
